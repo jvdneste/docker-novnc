@@ -25,7 +25,7 @@ RUN \
 RUN \
   apt-get update \
     && apt-get install -y \
-      vim byobu firefox \
+      vim byobu chromium-browser \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -39,10 +39,10 @@ CMD \
 # VNC Server
   if [ -z $VNC_PASSWD ]; then \
     # no password
-    sleep 3 && x11vnc -display :$SERVERNUM -xkb -forever & \
+    x11vnc -auth /root/.xvfbauth -display :$SERVERNUM -xkb -forever & \
   else \
     # set password from VNC_PASSWD env variable
-    sleep 3 && mkdir -p ~/.x11vnc \
+    mkdir -p ~/.x11vnc \
       && x11vnc -storepasswd $VNC_PASSWD /root/.x11vnc/passwd \
       && x11vnc -auth /root/.xvfbauth -display :$SERVERNUM -xkb -forever -rfbauth /root/.x11vnc/passwd & \
   fi \
