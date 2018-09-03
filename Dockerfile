@@ -24,29 +24,27 @@ RUN \
 
 RUN \
   apt-get update \
-  && apt-get install -y \
-    vim byobu firefox \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y \
+      vim byobu firefox \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV SERVERNUM 1
 
 CMD \
-  byobu-enable & \
-  byobu-enable-prompt; exit 0 & \
-  setcap -r `which i3status` & \
 # X Server
-  rm -f /tmp/.X1-lock & \
-  Xvfb :1 -screen 0 1600x900x16 & \
-# Window manager
-  (export DISPLAY=:1 && i3) & \
+  rm -f /tmp/.X1-lock \
+    && setcap -r `which i3status` \
+    && xvfb-run -f /root/.xvfbauth -n $SERVERNUM -s '-screen 0 1600x900x16' i3 & \
 # VNC Server
   if [ -z $VNC_PASSWD ]; then \
     # no password
-    x11vnc -display :1 -xkb -forever & \
+    sleep 3 && x11vnc -display :$SERVERNUM -xkb -forever & \
   else \
     # set password from VNC_PASSWD env variable
-    mkdir -p ~/.x11vnc \
+    sleep 3 && mkdir -p ~/.x11vnc \
       && x11vnc -storepasswd $VNC_PASSWD /root/.x11vnc/passwd \
-      && x11vnc -display :1 -xkb -forever -rfbauth /root/.x11vnc/passwd & \
+      && x11vnc -auth /root/.xvfbauth -display :$SERVERNUM -xkb -forever -rfbauth /root/.x11vnc/passwd & \
   fi \
 # NoVNC
     && openssl req -new -x509 -days 36500 -nodes -batch -out /root/noVNC.pem -keyout /root/noVNC.pem \
