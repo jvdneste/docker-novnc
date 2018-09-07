@@ -25,7 +25,7 @@ RUN \
 RUN \
   apt-get update \
     && apt-get install -y \
-      vim byobu chromium-browser \
+      vim byobu libgtk-3.0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,7 +33,8 @@ ENV SERVERNUM 1
 
 CMD \
 # X Server
-  rm -f /tmp/.X1-lock \
+  cd /root \
+    && rm -f /tmp/.X1-lock \
     && setcap -r `which i3status` \
     && xvfb-run -f /root/.xvfbauth -n $SERVERNUM -s '-screen 0 1600x900x16' i3 & \
 # VNC Server
@@ -43,6 +44,7 @@ CMD \
   else \
     # set password from VNC_PASSWD env variable
     mkdir -p ~/.x11vnc \
+      && sleep 3 \
       && x11vnc -storepasswd $VNC_PASSWD /root/.x11vnc/passwd \
       && x11vnc -auth /root/.xvfbauth -display :$SERVERNUM -xkb -forever -rfbauth /root/.x11vnc/passwd & \
   fi \
