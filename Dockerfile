@@ -25,7 +25,7 @@ RUN \
 RUN \
   apt-get update \
     && apt-get install -y \
-      vim byobu libgtk-3.0 \
+      vim wget byobu libgtk-3.0 libwebkitgtk-3.0.0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
